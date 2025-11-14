@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h3>Simple Photo Editor</h3>
+
+<input type="file" id="upload" accept="image/*"><br><br>
+
+<canvas id="can" width="400" height="300" style="border:1px solid"></canvas><br><br>
+
+Brightness:
+<input type="range" id="b" min="50" max="150" value="100"><br>
+Contrast:
+<input type="range" id="c" min="50" max="150" value="100"><br>
+Saturation:
+<input type="range" id="s" min="50" max="150" value="100"><br><br>
+
+<button onclick="rotate()">Rotate</button>
+<button onclick="reset()">Reset</button>
+<button onclick="save()">Download</button>
+
+<script>
+let can = document.getElementById("can");
+let ctx = can.getContext("2d");
+let img = new Image();
+let angle = 0;
+
+// Load image
+upload.onchange = e => {
+  img.src = URL.createObjectURL(e.target.files[0]);
+  img.onload = () => { angle = 0; draw(); };
+};
+
+// Draw with filters + rotation
+function draw() {
+  let w = can.width, h = can.height;
+
+  ctx.clearRect(0,0,w,h);
+
+  ctx.save();
+
+  ctx.translate(w/2, h/2);
+  ctx.rotate(angle * Math.PI / 180);
+
+  ctx.filter =
+    "brightness(" + b.value + "%) " +
+    "contrast(" + c.value + "%) " +
+    "saturate(" + s.value + "%)";
+
+  ctx.drawImage(img, -w/2, -h/2, w, h);
+
+  ctx.restore();
+}
+
+// Update filters live
+b.oninput = c.oninput = s.oninput = draw;
+
+// Rotate image 90° each click
+function rotate() {
+  angle = (angle + 90) % 360;
+  draw();
+}
+
+// Reset everything
+function reset() {
+  b.value = c.value = s.value = 100;
+  angle = 0;
+  draw();
+}
+
+// Download final image
+function save() {
+  let a = document.createElement("a");
+  a.href = can.toDataURL();
+  a.download = "edited.png";
+  a.click();
+}
+</script>
+
+</body>
+</html>

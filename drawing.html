@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<body style="text-align:center">
+
+<h3>🎨 Draw & Save</h3>
+
+<canvas id="c" width="800" height="400" style="border:1px solid"></canvas><br>
+
+<input type="color" id="clr">
+<input type="range" id="sz" min="1" max="50" value="5">
+
+<button onclick="x.clearRect(0,0,c.width,c.height)">Clear</button>
+<button onclick="save()">Save</button>
+
+<script>
+let c = document.getElementById("c");
+let x = c.getContext("2d");
+let d = false;
+
+c.onmousedown = () => d = true;
+c.onmouseup = () => { d = false; 
+x.beginPath(); };
+
+c.onmousemove = e => {
+  if (!d) return;
+  let r = c.getBoundingClientRect();
+  let X = e.clientX - r.left;
+  let Y = e.clientY - r.top;
+  x.lineWidth = sz.value;
+  x.strokeStyle = clr.value;
+  x.lineCap = "round";
+  x.lineTo(X, Y);
+  x.stroke();
+  x.beginPath();
+  x.moveTo(X, Y);
+}
+
+function save() {
+  let a = document.createElement("a");
+  a.download = "drawing.png";
+  a.href = c.toDataURL();
+  a.click();
+}
+</script>
+
+</body>
+</html>

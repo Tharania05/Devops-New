@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Event Scheduler</title>
+<style>
+body{text-align:center;font-family:Arial;background:#eef}
+#cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;max-width:400px;margin:auto}
+.day{background:#fff;padding:10px;height:80px;border:1px solid #ccc;cursor:pointer}
+.event{font-size:12px;background:#0078ff;color:#fff;padding:2px;border-radius:3px;margin-top:5px}
+#box{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+background:#fff;padding:10px;border:1px solid #666}
+</style>
+</head>
+<body>
+
+<h3>📅 Event Scheduler</h3>
+<button onclick="changeMonth(-1)">◀</button>
+<span id="mon"></span>
+<button onclick="changeMonth(1)">▶</button>
+
+<div id="cal"></div>
+
+<div id="box">
+  <h4>Event</h4>
+  <input id="title" placeholder="Title"><br><br>
+  <input id="loc" placeholder="Location"><br><br>
+  <input id="time" type="time"><br><br>
+  <button onclick="saveEvent()">Save</button>
+  <button onclick="deleteEvent()">Delete</button>
+  <button onclick="box.style.display='none'">Close</button>
+</div>
+
+<script>
+let d=new Date(), ev={}, selKey="";
+
+// load calendar
+function load(){
+  cal.innerHTML="";
+  mon.innerText=d.toLocaleString('default',{month:'long',year:'numeric'});
+  let y=d.getFullYear(), m=d.getMonth();
+  let fd=new Date(y,m,1).getDay();
+  let days=new Date(y,m+1,0).getDate();
+
+  for(let i=0;i<fd;i++) cal.innerHTML+="<div></div>";
+
+  for(let i=1;i<=days;i++){
+    let key=`${y}-${m}-${i}`;
+    let box=`<div class='day' onclick="openForm('${key}')"><b>${i}</b>`;
+    if(ev[key])
+      box+=`<div class="event">${ev[key].title}<br>${ev[key].time}</div>`;
+    box+="</div>";
+    cal.innerHTML+=box;
+  }
+}
+
+function changeMonth(n){ d.setMonth(d.getMonth()+n); load(); }
+
+// open form
+function openForm(k){
+  selKey=k;
+  // load existing event if present
+  if(ev[k]){
+    title.value=ev[k].title;
+    loc.value=ev[k].loc;
+    time.value=ev[k].time;
+  } else {
+    title.value=loc.value=time.value="";
+  }
+  box.style.display="block";
+}
+
+// save event
+function saveEvent(){
+  ev[selKey]={title:title.value, loc:loc.value, time:time.value};
+  box.style.display="none";
+  load();
+}
+
+// delete event
+function deleteEvent(){
+  delete ev[selKey];
+  box.style.display="none";
+  load();
+}
+
+load();
+</script>
+
+</body>
+</html>

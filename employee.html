@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h3>Employee Table (API Version)</h3>
+
+Search:
+<input id="search" placeholder="Search name">
+
+Department:
+<select id="filter">
+  <option value="">All</option>
+  <option>Engineering</option>
+  <option>HR</option>
+  <option>Finance</option>
+  <option>Sales</option>
+</select>
+
+<br><br>
+
+<table border="1" cellpadding="5">
+  <thead>
+    <tr><th>Name</th><th>Email</th><th>Dept</th></tr>
+  </thead>
+  <tbody id="body"></tbody>
+</table>
+
+<script>
+// Departments list
+let depts = ["Engineering","HR","Finance","Sales"];
+
+// Data from API will be stored here
+let employees = [];
+
+// Fetch 3 random users
+async function load() {
+  let res = await fetch("https://randomuser.me/api/?results=3");
+  let json = await res.json();
+
+  employees = json.results.map(u => ({
+    name: u.name.first + " " + u.name.last,
+    email: u.email,
+    dept: depts[Math.floor(Math.random() * depts.length)]
+  }));
+
+  show(employees);
+}
+
+// Display table
+function show(list) {
+  body.innerHTML = list.map(e =>
+    `<tr><td>${e.name}</td><td>${e.email}</td><td>${e.dept}</td></tr>`
+  ).join("");
+}
+
+// Search + Filter
+search.oninput = filter.onchange = function () {
+  let text = search.value.toLowerCase();
+  let dep = filter.value;
+
+  let result = employees.filter(e =>
+    e.name.toLowerCase().includes(text) &&
+    (dep === "" || e.dept === dep)
+  );
+
+  show(result);
+};
+
+// Load API data on page start
+load();
+</script>
+
+</body>
+</html>
